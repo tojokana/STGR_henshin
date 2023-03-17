@@ -1,4 +1,4 @@
-local isTransformed = false
+
 
 function DrawNotification(text)
     SetNotificationTextEntry("STRING")
@@ -8,10 +8,10 @@ end
 
 RegisterNetEvent("stgr_henshin:transformed")
 AddEventHandler("stgr_henshin:transformed", function(model)
+    local isTransformed = false
     local ped = GetPlayerPed(PlayerId())
-
     if isTransformed then
-        isTransformed = false
+        -- Do something
         ResetPedMovementClipset(ped, 0)
         RequestAnimDict("missheistdockssetup1clipboard@base")
         while not HasAnimDictLoaded("missheistdockssetup1clipboard@base") do
@@ -20,7 +20,7 @@ AddEventHandler("stgr_henshin:transformed", function(model)
         SetPedMovementClipset(ped, "missheistdockssetup1clipboard@base", 1.0)
         DrawNotification("~g~You have returned to your original form.")
     else
-        isTransformed = true
+        -- Do something else
         RequestModel(model)
         while not HasModelLoaded(model) do
             Citizen.Wait(100)
@@ -29,6 +29,7 @@ AddEventHandler("stgr_henshin:transformed", function(model)
         SetModelAsNoLongerNeeded(model)
         DrawNotification("~g~You have been transformed!")
     end
+    isTransformed = not isTransformed
 end)
 
 Citizen.CreateThread(function()
