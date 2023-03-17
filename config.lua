@@ -1,13 +1,9 @@
--- Default language code
--- This will be used if the player's language is not available in the language files
--- Please refer to https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes for language codes
-default_language = "en"
+-- デフォルト言語
+language = "ja"
 
--- Load language file
-local language_file = "language/" .. default_language .. ".lua"
-local lang = assert(loadfile(language_file))()
-
--- Function to get localized string
-function getLocalizedText(key)
-    return lang[key] or key
-end
+-- 言語ごとのファイルパス
+languages = {
+  ja = "languages/ja.lua",
+  en = "languages/en.lua",
+  -- 追加の言語があればここに記述する
+}
