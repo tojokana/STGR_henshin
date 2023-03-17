@@ -1,14 +1,13 @@
--- 言語の設定
-language = "ja"
+-- Default language code
+-- This will be used if the player's language is not available in the language files
+-- Please refer to https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes for language codes
+default_language = "en"
 
-return {
-    message = {
-        server_error = "サーバーエラーが発生しました。しばらくしてから再度お試しください。",
-        transformation_success = "変身に成功しました！",
-        transformation_failure = "変身に失敗しました。",
-        invalid_character = "不正なキャラクターです。",
-        invalid_transformation = "このキャラクターは変身できません。",
-        insufficient_mana = "魔力が不足しています。",
-        transformation_cost = "変身には%dmPの魔力が必要です。"
-    }
-}
+-- Load language file
+local language_file = "language/" .. default_language .. ".lua"
+local lang = assert(loadfile(language_file))()
+
+-- Function to get localized string
+function getLocalizedText(key)
+    return lang[key] or key
+end
