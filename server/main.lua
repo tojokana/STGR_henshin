@@ -28,16 +28,17 @@ AddEventHandler("stgr_henshin:transformed", function(model)
     end
 end)
 
--- TriggerServerEventを削除する
---[[
-RegisterNetEvent("stgr:henshin:changed")
-AddEventHandler("stgr:henshin:changed", function(model)
-  SetPlayerModel(PlayerId(), model)
-end)
---]]
+RegisterNetEvent("stgr_henshin:transformed")
+AddEventHandler("stgr_henshin:transformed", function(playerId, model)
+    local ped = GetPlayerPed(GetPlayerFromServerId(playerId))
 
--- TriggerClientEventでクライアント側で変身処理を行うように指示する
-RegisterServerEvent("stgr:henshin:change")
-AddEventHandler("stgr:henshin:change", function()
-  TriggerClientEvent("stgr:henshin:change")
+    if IsModelValid(model) then
+        RequestModel(model)
+        while not HasModelLoaded(model) do
+            Citizen.Wait(100)
+        end
+        SetPlayerModel(GetPlayerFromServerId(playerId), model)
+        SetModelAsNoLongerNeeded(model)
+        DrawNotification("~g~" .. GetPlayerName(GetPlayerFromServerId(playerId)) .. " has been transformed!")
+    end
 end)
