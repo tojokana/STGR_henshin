@@ -1,65 +1,66 @@
-local isHenshin = false -- 変身しているかどうかを示すフラグ
+local animals = {
+  "a_c_cat_01",
+  "a_c_chop"
+}
 
--- 変身するトリガーとなるコマンドを追加
-RegisterCommand("henshin", function()
-  TriggerServerEvent("stgr_henshin:transform")
-end)
+local function SetPedModel(ped, model)
+  local modelHash = GetHashKey(model)
+  RequestModel(modelHash)
+  while not HasModelLoaded(modelHash) do Citizen.Wait(0) end
+  SetPlayerModel(PlayerId(), modelHash)
+  SetModelAsNoLongerNeeded(modelHash)
+end
 
--- サーバーからの通知を受け取って変身する
-RegisterNetEvent("stgr_henshin:transformPlayer")
-AddEventHandler("stgr_henshin:transformPlayer", function(modelHash)
-  -- 変身中でない場合のみ変身する
-  if not isHenshin then
-    RequestModel(modelHash)
-    while not HasModelLoaded(modelHash) do
-      Wait(1)
+RegisterNetEvent('stgr_henshin:transform')
+AddEventHandler(
+  'stgr_henshin:transform', function(animal)
+    local playerPed = GetPlayerPed(-1)
+    if DoesEntityExist(playerPed) and not IsEntityDead(playerPed) then
+      if animal and type(animal) == 'string' then
+        if not HasAnimDictLoaded("mp_common") then
+          RequestAnimDict("mp_common")
+          while not HasAnimDictLoaded("mp_common") do Citizen.Wait(0) end
+        end
+
+        local model = GetHashKey(animals[animal])
+        if IsModelValid(model) then
+          SetPedModel(playerPed, animals[animal])
+          SetPedDefaultComponentVariation(playerPed)
+          SetPedRandomProps(playerPed)
+          ClearPedDecorations(playerPed)
+          SetEntityHealth(playerPed, GetPedMaxHealth(playerPed))
+
+          TaskPlayAnim(playerPed, "mp_common", "givetake1_a", 8.0, -8.0, -1, 0, 0, false, false, false)
+          Wait(3000)
+          ClearPedTasks(playerPed)
+        else
+          TriggerEvent(
+            'chat:addMessage', {
+              args = {
+                'Failed to change model: Invalid model hash'
+              }
+            })
+        end
+      end
     end
+  end)
 
-    local playerPed = PlayerPedId()
-    SetPlayerModel(PlayerId(), modelHash)
-    SetPedRandomComponentVariation(playerPed, true)
-    SetModelAsNoLongerNeeded(modelHash)
-
-    isHenshin = true
-    exports["mythic_notify"]:SendAlert("success", "変身しました。")
-  else
-    exports["mythic_notify"]:SendAlert("error", "すでに変身しています。")
-  end
-end)
-
--- 元のモデルに戻るコマンドを追加
-RegisterCommand("henshin_back", function()
-  TriggerServerEvent("stgr_henshin:transformBack")
-end)
-
--- サーバーからの通知を受け取って元のモデルに戻る
-RegisterNetEvent("stgr_henshin:transformPlayerBack")
-AddEventHandler("stgr_henshin:transformPlayerBack", function(modelHash)
-  -- 変身中である場合のみ元のモデルに戻る
-  if isHenshin then
-    RequestModel(modelHash)
-    while not HasModelLoaded(modelHash) do
-      Wait(1)
+RegisterNetEvent('stgr_henshin:restore')
+AddEventHandler(
+  'stgr_henshin:restore', function()
+    local playerPed = GetPlayerPed(-1)
+    if DoesEntityExist(playerPed) and not IsEntityDead(playerPed) then
+      local model = GetHashKey(GetEntityModel(playerPed))
+      SetPedDefaultComponentVariation(playerPed)
+      SetPedRandomProps(playerPed)
+      ClearPedDecorations(playerPed)
+      SetEntityHealth(playerPed, GetPedMaxHealth(playerPed))
+      SetPedModel(playerPed, model)
+      TriggerEvent(
+        'chat:addMessage', {
+          args = {
+            'You have been restored to your original form'
+          }
+        })
     end
-
-    local playerPed = PlayerPedId()
-    SetPlayerModel(PlayerId(), modelHash)
-    SetPedRandomComponentVariation(playerPed, true)
-    SetModelAsNoLongerNeeded(modelHash)
-
-    isHenshin = false
-    exports["mythic_notify"]:SendAlert("success", "元に戻りました。")
-  else
-    exports["mythic_notify"]:SendAlert("error", "変身していません。")
-  end
-end)
-
-RegisterNetEvent('stgr_henshin:transformed')
-AddEventHandler('stgr_henshin:transformed', function(model)
-    local playerPed = PlayerPedId()
-    if IsPedModel(playerPed, GetHashKey(model)) then
-        ESX.ShowNotification('You transformed into a ' .. model .. '!')
-    else
-        ESX.ShowNotification('Failed to transform into a ' .. model .. '.')
-    end
-end)
+  end)
