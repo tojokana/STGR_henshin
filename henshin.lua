@@ -1,3 +1,5 @@
+local playerPed = GetPlayerPed(-1)
+
 local animals = {
   "a_c_cat_01",
   "a_c_chop"
