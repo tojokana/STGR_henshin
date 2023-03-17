@@ -1,3 +1,12 @@
+RegisterCommand('henshin', function(source, args)
+  local model = tonumber(args[1])
+  if model == nil then
+      DrawNotification("~r~Invalid model ID.")
+      return
+  end
+  TriggerServerEvent("stgr_henshin:transform", model)
+end)
+
 function DrawNotification(text)
   SetNotificationTextEntry("STRING")
   AddTextComponentString(text)
