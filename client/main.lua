@@ -1,32 +1,62 @@
-RegisterCommand("henshin", function(source, args, rawCommand)
-  local model
-  local playerPed = PlayerPedId()
-  
-  if not args[1] then -- 引数がない場合、元のスキンに戻る
-    model = GetHashKey("mp_m_freemode_01")
-  elseif args[1] == "cat" then -- "cat" が引数の場合、 a_c_cat_01 のスキンに変更する
-    model = GetHashKey("a_c_cat_01")
-  elseif args[1] == "dog" then -- "dog" が引数の場合、 a_c_husky のスキンに変更する
-    model = GetHashKey("a_c_husky")
-  end
-  
-  if model then
-    QBCore.Functions.SpawnCharacter(playerPed, { x = 0, y = 0, z = 0 }, function(spawnedPed)
-      SetPlayerModel(PlayerId(), model)
-      SetModelAsNoLongerNeeded(model)
-      FreezeEntityPosition(spawnedPed, true)
-      SetEntityInvincible(spawnedPed, true)
-      SetEntityVisible(spawnedPed, false, false)
-      SetTimeout(1000, function()
-        SetPlayerModel(PlayerId(), model)
-        FreezeEntityPosition(playerPed, false)
-        SetEntityInvincible(playerPed, false)
-        SetEntityVisible(playerPed, true, false)
-        SetModelAsNoLongerNeeded(model)
-      end)
-    end)
-  end
-end, false)
+local currentSkin = nil
+
+RegisterCommand('henshin', function(source, args)
+    if not IsPedInAnyVehicle(PlayerPedId(), false) then
+        if args[1] == nil then
+            if currentSkin ~= nil then
+                SetPlayerModel(PlayerId(), currentSkin)
+                TriggerEvent('skinchanger:loadSkin', currentSkin)
+                currentSkin = nil
+                TriggerEvent('chat:addMessage', {
+                    color = {255, 0, 0},
+                    multiline = true,
+                    args = {'STGR', '変身を解除しました。'}
+                })
+            else
+                TriggerEvent('chat:addMessage', {
+                    color = {255, 0, 0},
+                    multiline = true,
+                    args = {'STGR', '現在は変身していません。'}
+                })
+            end
+        else
+            local skin = nil
+            if args[1] == 'cat' then
+                skin = GetHashKey('a_c_cat_01')
+            elseif args[1] == 'rat' then
+                skin = GetHashKey('a_c_rat_01')
+            elseif args[1] == 'crow' then
+                skin = GetHashKey('a_c_crow')
+            end
+            if skin ~= nil then
+                RequestModel(skin)
+                while not HasModelLoaded(skin) do
+                    Citizen.Wait(1)
+                end
+                SetPlayerModel(PlayerId(), skin)
+                TriggerEvent('skinchanger:loadSkin', skin)
+                currentSkin = skin
+                TriggerEvent('chat:addMessage', {
+                    color = {255, 0, 0},
+                    multiline = true,
+                    args = {'STGR', '変身しました。'}
+                })
+            else
+                TriggerEvent('chat:addMessage', {
+                    color = {255, 0, 0},
+                    multiline = true,
+                    args = {'STGR', '変身できませんでした。'}
+                })
+            end
+        end
+    else
+        TriggerEvent('chat:addMessage', {
+            color = {255, 0, 0},
+            multiline = true,
+            args = {'STGR', '車両に乗っているため、変身できません。'}
+        })
+    end
+end)
 
 function DrawNotification(text)
   SetNotificationTextEntry("STRING")
