@@ -8,13 +8,6 @@ version '1.0.0'
 shared_script 'config.lua'
 
 client_script {
-    'client/main.lua',
-    'locales/en.lua',
-    'locales/ja.lua',
-}
-
-files {
-    'html/index.html',
-    'html/script.js',
-    'html/style.css',
+    './client/main.lua',
+    './locales/*.lua',
 }
