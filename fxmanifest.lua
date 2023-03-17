@@ -3,7 +3,6 @@ game 'gta5'
 
 author 'tojokana'
 description 'STGR Henshin'
-version '1.0.0'
 
 shared_script 'config.lua'
 
