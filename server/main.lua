@@ -2,7 +2,7 @@ local isTransformed = false
 
 RegisterNetEvent("stgr_henshin:transformed")
 AddEventHandler("stgr_henshin:transformed", function(model)
-    local ped = GetPlayerPed(-1)
+    local ped = GetPlayerPed(source)
 
     if isTransformed then
         isTransformed = false
@@ -23,7 +23,7 @@ AddEventHandler("stgr_henshin:transformed", function(model)
         SetModelAsNoLongerNeeded(model)
         DrawNotification("~g~You have been transformed!")
         
-        TriggerClientEvent("stgr_henshin:transformed", -1, PlayerId(), model)
+        TriggerClientEvent("stgr_henshin:transformed", source, model)
     end
 end)
 
