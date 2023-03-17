@@ -1,6 +1,18 @@
 # STGR_henshin
 変身します。
 
+## 動作環境
+- FiveM
+
+## インストール方法
+1. `stgr_henshin`をリソースフォルダに追加します。
+2. `server.cfg`に`ensure stgr_henshin`を追加します。
+
+## 使い方
+- `/henshin cat`: 猫に変身します。
+- `/henshin dog`: 犬に変身します。
+- `/henshin`: 元に戻ります。
+
 ## 仕様
 
 ### 【クライアント側】
