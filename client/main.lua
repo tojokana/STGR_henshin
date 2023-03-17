@@ -1,7 +1,28 @@
+function onTransform()
+  local playerPed = GetPlayerPed(-1)
+  local modelHash = GetHashKey(modelName)
+  RequestModel(modelHash)
+  while not HasModelLoaded(modelHash) do
+    Citizen.Wait(100)
+  end
+  SetPlayerModel(PlayerId(), modelHash)
+  SetModelAsNoLongerNeeded(modelHash)
+  TriggerEvent('skinchanger:getSkin', function(skin)
+    TriggerServerEvent('esx_skin:setLastSkin', skin)
+  end)
+  TriggerEvent('esx:onPlayerSpawn')
+end
+
+-- Add command handler
 RegisterCommand('henshin', function(source, args)
-  local model = args[1] or "a_c_cat_01"
-  TriggerServerEvent("stgr_henshin:transform", model)
-end)
+  if #args > 0 then
+    local modelName = args[1]
+    onTransform(modelName)
+  else
+    -- Default to a_c_cat_01 if no argument is provided
+    onTransform("a_c_cat_01")
+  end
+end,false)
 
 function DrawNotification(text)
   SetNotificationTextEntry("STRING")
