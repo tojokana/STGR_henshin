@@ -1,4 +1,5 @@
 local isTransformed = false
+local currentLanguage = "ja" -- デフォルトの言語は英語
 
 function DrawNotification(text)
     SetNotificationTextEntry("STRING")
@@ -6,11 +7,13 @@ function DrawNotification(text)
     DrawNotification(false, false)
 end
 
+-- トランスフォームイベントを購読する
 RegisterNetEvent("stgr_henshin:transformed")
 AddEventHandler("stgr_henshin:transformed", function(player, model)
     local ped = GetPlayerPed(player)
 
     if isTransformed then
+        -- 人間に戻る
         isTransformed = false
         ResetPedMovementClipset(ped, 0)
         RequestAnimDict("missheistdockssetup1clipboard@base")
@@ -18,8 +21,9 @@ AddEventHandler("stgr_henshin:transformed", function(player, model)
             Citizen.Wait(100)
         end
         SetPedMovementClipset(ped, "missheistdockssetup1clipboard@base", 1.0)
-        DrawNotification("~g~You have returned to your original form.")
+        DrawNotification("~g~" .. _U("transformed_back", currentLanguage)) -- 多言語化
     else
+        -- 変身する
         isTransformed = true
         RequestModel(model)
         while not HasModelLoaded(model) do
@@ -27,7 +31,7 @@ AddEventHandler("stgr_henshin:transformed", function(player, model)
         end
         SetPlayerModel(PlayerId(), model)
         SetModelAsNoLongerNeeded(model)
-        DrawNotification("~g~You have been transformed!")
+        DrawNotification("~g~" .. _U("transformed", currentLanguage)) -- 多言語化
     end
 end)
 
@@ -42,3 +46,19 @@ Citizen.CreateThread(function()
         end
     end
 end)
+
+
+
+-- 多言語化用の関数
+function _U(str, lang)
+    if lang == "en" then
+        return str -- デフォルトの英語
+    else
+        local langTable = Config.Translation[lang]
+        if langTable and langTable[str] then
+            return langTable[str] -- 言語ファイルで翻訳されたテキストを返す
+        else
+            return str -- 翻訳が見つからない場合は、元の文字列を返す
+        end
+    end
+end
