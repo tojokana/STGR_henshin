@@ -7,8 +7,8 @@ function DrawNotification(text)
 end
 
 RegisterNetEvent("stgr_henshin:transformed")
-AddEventHandler("stgr_henshin:transformed", function(player, model)
-    local ped = GetPlayerPed(player)
+AddEventHandler("stgr_henshin:transformed", function(source, model)
+    local ped = GetPlayerPed(source)
 
     if isTransformed then
         isTransformed = false
