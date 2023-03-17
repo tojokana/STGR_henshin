@@ -1,14 +1,14 @@
-fx_version 'cerulean'
-game 'gta5'
+fx_version "cerulean"
+game "gta5"
 
-author 'tojokana'
-description 'Henshin script for FiveM'
-version '1.0.0'
+name "stgr_henshin"
+author "tojokana"
+description "Animal transformation script"
 
 client_scripts {
-    'client/henshin.lua'
+    "client.lua"
 }
 
 server_scripts {
-    'server/henshin_server.lua'
+    "server.lua"
 }
