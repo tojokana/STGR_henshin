@@ -3,29 +3,28 @@ local modelList = {
     [GetHashKey("a_c_chickenhawk")] = true,
 }
 
-RegisterServerEvent("stgr_henshin:transformPlayer")
-AddEventHandler("stgr_henshin:transformPlayer", function(model)
-    local source = source
-    local ped = GetPlayerPed(source)
+RegisterNetEvent("stgr_henshin:transformed")
+AddEventHandler("stgr_henshin:transformed", function(model)
+    local src = source
+    local ped = GetPlayerPed(src)
 
-    if not modelList[tonumber(model)] then
-        print(("^1Invalid Model %s!"):format(model))
-        return
+    if isTransformed[src] then
+        isTransformed[src] = false
+        ResetPedMovementClipset(ped, 0)
+        RequestAnimDict("missheistdockssetup1clipboard@base")
+        while not HasAnimDictLoaded("missheistdockssetup1clipboard@base") do
+            Citizen.Wait(100)
+        end
+        SetPedMovementClipset(ped, "missheistdockssetup1clipboard@base", 1.0)
+        DrawNotification("~g~You have returned to your original form.")
+    else
+        isTransformed[src] = true
+        RequestModel(model)
+        while not HasModelLoaded(model) do
+            Citizen.Wait(100)
+        end
+        SetPlayerModel(src, model)
+        SetModelAsNoLongerNeeded(model)
+        DrawNotification("~g~You have been transformed!")
     end
-
-    if not IsModelValid(model) or not HasModelLoaded(model) then
-        print(("^1Invalid Model %s!"):format(model))
-        return
-    end
-
-    SetPlayerModel(source, model)
-    SetModelAsNoLongerNeeded(model)
-
-    TriggerClientEvent("stgr_henshin:transformed", -1, model)
-
-    Citizen.CreateThread(function()
-        Wait(600000)
-        SetPlayerModel(source, GetHashKey("mp_m_freemode_01"))
-        TriggerClientEvent("stgr_henshin:transformed", -1, GetHashKey("mp_m_freemode_01"))
-    end)
 end)
