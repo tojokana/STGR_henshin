@@ -21,11 +21,11 @@ AddEventHandler("stgr_henshin:transformPlayer", function(model)
     SetPlayerModel(source, model)
     SetModelAsNoLongerNeeded(model)
 
-    TriggerClientEvent("stgr_henshin:transformed", -1, source, model)
+    TriggerClientEvent("stgr_henshin:transformed", -1, model)
 
     Citizen.CreateThread(function()
         Wait(600000)
         SetPlayerModel(source, GetHashKey("mp_m_freemode_01"))
-        TriggerClientEvent("stgr_henshin:transformed", -1, source, GetHashKey("mp_m_freemode_01"))
+        TriggerClientEvent("stgr_henshin:transformed", -1, GetHashKey("mp_m_freemode_01"))
     end)
 end)
