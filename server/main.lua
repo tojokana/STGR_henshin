@@ -2,7 +2,7 @@ local isTransformed = false
 
 RegisterNetEvent("stgr_henshin:transformed")
 AddEventHandler("stgr_henshin:transformed", function(model)
-    local ped = GetPlayerPed(source)
+    local ped = GetPlayerPed(-1)
 
     if isTransformed then
         isTransformed = false
@@ -21,11 +21,23 @@ AddEventHandler("stgr_henshin:transformed", function(model)
         end
         SetPlayerModel(PlayerId(), model)
         SetModelAsNoLongerNeeded(model)
-        RequestAnimDict("missheistdockssetup1clipboard@base")
-        while not HasAnimDictLoaded("missheistdockssetup1clipboard@base") do
+        DrawNotification("~g~You have been transformed!")
+        
+        TriggerClientEvent("stgr_henshin:transformed", -1, PlayerId(), model)
+    end
+end)
+
+RegisterNetEvent("stgr_henshin:transformed")
+AddEventHandler("stgr_henshin:transformed", function(playerId, model)
+    local ped = GetPlayerPed(GetPlayerFromServerId(playerId))
+
+    if IsModelValid(model) then
+        RequestModel(model)
+        while not HasModelLoaded(model) do
             Citizen.Wait(100)
         end
-        SetPedMovementClipset(GetPlayerPed(-1), "missheistdockssetup1clipboard@base", 1.0)
-        DrawNotification("~g~You have been transformed!")
+        SetPlayerModel(GetPlayerFromServerId(playerId), model)
+        SetModelAsNoLongerNeeded(model)
+        DrawNotification("~g~" .. GetPlayerName(GetPlayerFromServerId(playerId)) .. " has been transformed!")
     end
 end)
