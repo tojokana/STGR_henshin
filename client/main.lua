@@ -1,9 +1,5 @@
 RegisterCommand('henshin', function(source, args)
-  local model = tonumber(args[1])
-  if model == nil then
-      DrawNotification("~r~Invalid model ID.")
-      return
-  end
+  local model = args[1] or "a_c_cat_01"
   TriggerServerEvent("stgr_henshin:transform", model)
 end)
 
@@ -32,16 +28,5 @@ AddEventHandler("stgr_henshin:transformed", function(model)
     SetPlayerModel(PlayerId(), model)
     SetModelAsNoLongerNeeded(model)
     DrawNotification("~g~You have been transformed!")
-  end
-end)
-Citizen.CreateThread(function()
-  while true do
-    Citizen.Wait(0)
-
-    if IsControlJustPressed(1, 167) then -- Press F6 to transform
-      TriggerServerEvent("stgr_henshin:transformPlayer", GetHashKey("a_c_cat_01"))
-    elseif IsControlJustPressed(1, 168) then -- Press F7 to transform
-      TriggerServerEvent("stgr_henshin:transformPlayer", GetHashKey("a_c_chickenhawk"))
-    end
   end
 end)
