@@ -1,11 +1,11 @@
+QBCore = exports['qb-core']:GetCoreObject()
 local currentSkin = nil
 
 RegisterCommand('henshin', function(source, args)
     if not IsPedInAnyVehicle(PlayerPedId(), false) then
         if args[1] == nil then
             if currentSkin ~= nil then
-                SetPlayerModel(PlayerId(), currentSkin)
-                TriggerEvent('skinchanger:loadSkin', currentSkin)
+              RevertSkin()
                 currentSkin = nil
                 TriggerEvent('chat:addMessage', {
                     color = {255, 0, 0},
@@ -57,6 +57,51 @@ RegisterCommand('henshin', function(source, args)
         })
     end
 end)
+local function RevertSkin()
+  local playerPed = PlayerPedId()
+  QBCore.Functions.TriggerCallback('qb-clothing:loadPlayerClothing', function(clothing)
+      if clothing ~= nil then
+          if clothing[1] ~= nil then
+              TriggerEvent('skinchanger:loadClothes', playerPed, clothing[1])
+          end
+          if clothing[2] ~= nil then
+              TriggerEvent('skinchanger:loadClothes', playerPed, clothing[2])
+          end
+      end
+  end, QBCore.Functions.GetPlayerData().charinfo.gender)
+end
+
+function henshin(catModel)
+  local playerPed = PlayerPedId()
+
+  if catModel ~= nil then
+      if IsModelValid(catModel) then
+          RequestModel(catModel)
+          while not HasModelLoaded(catModel) do
+              Citizen.Wait(0)
+          end
+          SetPlayerModel(PlayerId(), catModel)
+          SetModelAsNoLongerNeeded(catModel)
+          SetPedDefaultComponentVariation(playerPed)
+          SetPedRandomComponentVariation(playerPed, true)
+      else
+          QBCore.Functions.Notify("Invalid model.")
+      end
+  else
+      QBCore.Functions.Notify("No model specified.")
+  end
+
+  Citizen.CreateThread(function()
+      while true do
+          Citizen.Wait(0)
+          if IsPedInAnyVehicle(playerPed, false) then
+              SetPedIntoVehicle(playerPed, GetVehiclePedIsIn(playerPed, false), -1)
+          end
+      end
+  end)
+
+  RevertSkin()
+end
 
 function DrawNotification(text)
   SetNotificationTextEntry("STRING")
